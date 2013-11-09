@@ -1,0 +1,83 @@
+﻿<UserControl
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:es="clr-namespace:Microsoft.Expression.Shapes;assembly=Microsoft.Expression.Drawing" x:Class="OdbCommunicator.Controls.BasicAnalog"
+    mc:Ignorable="d"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    d:DesignHeight="250" d:DesignWidth="250">
+    
+	<Grid>
+
+        <es:Arc 
+            Name="MeterBackground"
+            Margin="28"
+            ArcThickness="20" 
+            ArcThicknessUnit="Pixel" 
+            EndAngle="470" 
+            Fill="#FF9B9B9B" 
+            Stretch="None" 
+            StartAngle="250"/>
+        <es:Arc 
+            Name="Scale"
+            Margin="25"
+            ArcThickness="3" 
+            ArcThicknessUnit="Pixel" 
+            EndAngle="470" 
+            Fill="White" 
+            Stretch="None" 
+            Stroke="Transparent" 
+            StartAngle="250"/>
+        <es:Arc 
+            Name="Meter"
+            Margin="28"
+            ArcThickness="20" 
+            ArcThicknessUnit="Pixel" 
+            EndAngle="320" 
+            Fill="Red" 
+            Stretch="None" 
+            Stroke="Transparent" 
+            StartAngle="250"/>
+
+        <StackPanel 
+            Margin="55,0"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center">
+
+            <StackPanel 
+                Orientation="Horizontal" 
+                HorizontalAlignment="Center">
+                <TextBlock 
+                    TextAlignment="Center"
+                    Name="ValueText"
+                    Text="25" 
+                    FontSize="40"
+                    FontWeight="Bold"/>
+                <TextBlock 
+                    VerticalAlignment="Bottom"
+                    Margin="0,0,0,8"
+                    TextAlignment="Center"
+                    Name="UnitText"
+                    Text="%" 
+                    FontSize="10"
+                    FontWeight="Bold"/>
+            </StackPanel>
+
+            <TextBlock 
+                TextAlignment="Center"
+                Name="DescriptionText"
+                TextWrapping="Wrap"
+                Text="Accelerator pedal position (%)" 
+                FontSize="12"
+                FontWeight="Bold"/>
+
+        </StackPanel>
+        
+        <Grid Name="Values" />
+
+
+    </Grid>
+</UserControl>

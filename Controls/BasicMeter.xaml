@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="OdbCommunicator.Controls.BasicMeter"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    d:DesignHeight="480" d:DesignWidth="100">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="30"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border 
+            Grid.Column="0"
+            VerticalAlignment="Bottom"
+            Name="Meter"/>
+        <StackPanel
+            Margin="2,0,0,0"
+            Name="ScaleContainer"
+            Orientation="Vertical"
+            Grid.Column="1"/>
+        <StackPanel
+            Margin="0"
+            Name="ValueContainer"
+            Orientation="Vertical"
+            Grid.Column="2"/>
+    </Grid>
+</UserControl>
