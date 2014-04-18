@@ -150,6 +150,21 @@ namespace OdbCommunicator.OdbSockets
         }
 
         /// <summary>
+        /// Send message and check response
+        /// </summary>
+        /// <param name="what"></param>
+        /// <returns></returns>
+        public async Task<OdbResponse> SendAndCheck(OdbPid what)
+        {
+            OdbResponse response = await this.Send(what);
+            if (!response.Response.Contains(what.ExpectedResponse))
+            {
+                throw new OdbException(OdbError.WrongResponseFromDevice);
+            }
+            return response;
+        }
+
+        /// <summary>
         /// Receive data from device
         /// </summary>
         /// <param name="what"></param>
@@ -187,21 +202,6 @@ namespace OdbCommunicator.OdbSockets
             odbResponse.Time = DateTime.Now.Subtract(start);
 
             return odbResponse;
-        }
-
-        /// <summary>
-        /// Send message and check response
-        /// </summary>
-        /// <param name="what"></param>
-        /// <returns></returns>
-        public async Task<OdbResponse> SendAndCheck(OdbPid what)
-        {
-            OdbResponse response = await this.Send(what);
-            if (!response.Response.Contains(what.ExpectedResponse))
-            {
-                throw new OdbException(OdbError.WrongResponseFromDevice);
-            }
-            return response;
         }
 
         /// <summary>

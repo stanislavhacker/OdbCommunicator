@@ -98,6 +98,7 @@
     <Compile Include="OdbCommon\Ecu.cs" />
     <Compile Include="OdbCommon\OdbData.cs" />
     <Compile Include="OdbCommon\OdbPid.cs" />
+    <Compile Include="OdbCommon\OdbPriority.cs" />
     <Compile Include="OdbCommon\OdbReporter.cs" />
     <Compile Include="OdbEventArg\OdbEventArgs.cs" />
     <Compile Include="OdbExceptions\OdbError.cs" />

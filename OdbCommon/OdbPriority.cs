@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OdbCommunicator.OdbQueries
+namespace OdbCommunicator.OdbCommon
 {
-    public enum QueryStatus
+    public enum OdbPriority
     {
-        NotSupported,
-        NoData,
-        Complete
+        VeryHigh,
+        High,
+        Medium,
+        Small
     }
 }

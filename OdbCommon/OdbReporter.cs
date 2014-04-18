@@ -104,5 +104,19 @@ namespace OdbCommunicator.OdbCommon
                 Debug.WriteLine(InfoPrefix + "Registering new query for '{0} ({1})'.", newQuery.Pid.Description, newQuery.Pid.Pid);
             }
         }
+
+        /// <summary>
+        /// Report deleted query
+        /// </summary>
+        /// <param name="pid"></param>
+        public void ReportDeleteQuery(OdbPid pid)
+        {
+            if (!OdbClient.OBD_REPORTER_ENABLED)
+            {
+                return;
+            }
+
+            Debug.WriteLine(InfoPrefix + "Query for '{0} ({1})' has been removed from register queries.", pid.Description, pid.Pid);
+        }
     }
 }

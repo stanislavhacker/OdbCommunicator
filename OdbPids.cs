@@ -242,6 +242,7 @@ namespace OdbCommunicator
             MaxValue = 215,
             Units = "°C",
             Mode = OdbPids.ATSP1,
+            Priority = OdbPriority.Small,
             Compute = (A, B, C, D) =>
             {
                 return A - 40;
@@ -258,6 +259,7 @@ namespace OdbCommunicator
             MaxValue = 16383.75,
             Units = "RPM",
             Mode = OdbPids.ATSP1,
+            Priority = OdbPriority.VeryHigh,
             Compute = (A, B, C, D) => {
                 return ((A * 256) + B) / 4;
             }
@@ -273,19 +275,148 @@ namespace OdbCommunicator
             MaxValue = 255,
             Units = "km/h",
             Mode = OdbPids.ATSP1,
+            Priority = OdbPriority.VeryHigh,
             Compute = (A, B, C, D) =>
             {
                 return A;
             }
         };
 
-        /*public static readonly OdbPid MonitorStatus = new OdbPid()
+        public static OdbPid Mode1_EngineCalculatedLoad = new OdbPid()
         {
-            Pid = "01",
+            Pid = "04",
             ExpectedResponse = "",
-            Description = "Monitor status since DTCs cleared. (Includes malfunction indicator lamp (MIL) status and number of DTCs.)",
-            Mode = OdbPids.ATSP1
-        };*/
+            Description = "Calculated engine load value",
+            ByteCount = 1,
+            MinValue = 0,
+            MaxValue = 100,
+            Units = "%",
+            Mode = OdbPids.ATSP1,
+            Priority = OdbPriority.High,
+            Compute = (A, B, C, D) =>
+            {
+                return (A * 100) / 255;
+            }
+        };
+
+        public static OdbPid Mode1_MafAirFlowRate = new OdbPid()
+        {
+            Pid = "10",
+            ExpectedResponse = "",
+            Description = "MAF air flow rate",
+            ByteCount = 2,
+            MinValue = 0,
+            MaxValue = 655.35,
+            Units = "grams/sec",
+            Mode = OdbPids.ATSP1,
+            Priority = OdbPriority.Medium,
+            Compute = (A, B, C, D) =>
+            {
+                return ((A * 256) + B) / 100;
+            }
+        };
+
+        public static OdbPid Mode1_ThrottlePosition = new OdbPid()
+        {
+            Pid = "11",
+            ExpectedResponse = "",
+            Description = "Throttle position",
+            ByteCount = 1,
+            MinValue = 0,
+            MaxValue = 100,
+            Units = "%",
+            Mode = OdbPids.ATSP1,
+            Priority = OdbPriority.High,
+            Compute = (A, B, C, D) =>
+            {
+                return (A * 100) / 255;
+            }
+        };
+
+        public static OdbPid Mode1_RunTimeSinceEngineStart = new OdbPid()
+        {
+            Pid = "1F",
+            ExpectedResponse = "",
+            Description = "Run time since engine start",
+            ByteCount = 2,
+            MinValue = 0,
+            MaxValue = 65535,
+            Units = "seconds",
+            Mode = OdbPids.ATSP1,
+            Priority = OdbPriority.Small,
+            Compute = (A, B, C, D) =>
+            {
+                return (A * 256) + B;
+            }
+        };
+
+        public static OdbPid Mode1_RelativeAcceleratorPedalPosition = new OdbPid()
+        {
+            Pid = "5A",
+            ExpectedResponse = "",
+            Description = "Relative accelerator pedal position",
+            ByteCount = 1,
+            MinValue = 0,
+            MaxValue = 100,
+            Units = "%",
+            Mode = OdbPids.ATSP1,
+            Priority = OdbPriority.High,
+            Compute = (A, B, C, D) =>
+            {
+                return (A * 100) / 255;
+            }
+        };
+
+        public static OdbPid Mode1_EngineOilTemperature = new OdbPid()
+        {
+            Pid = "5C",
+            ExpectedResponse = "",
+            Description = "Engine oil temperature",
+            ByteCount = 2,
+            MinValue = -40,
+            MaxValue = 210,
+            Units = "°C",
+            Mode = OdbPids.ATSP1,
+            Priority = OdbPriority.Small,
+            Compute = (A, B, C, D) =>
+            {
+                return A - 40;
+            }
+        };
+
+        public static OdbPid Mode1_FuelInjectionTiming = new OdbPid()
+        {
+            Pid = "5D",
+            ExpectedResponse = "",
+            Description = "Fuel injection timing",
+            ByteCount = 2,
+            MinValue = -210,
+            MaxValue = 301.992,
+            Units = "°",
+            Mode = OdbPids.ATSP1,
+            Priority = OdbPriority.Medium,
+            Compute = (A, B, C, D) =>
+            {
+                return (((A*256)+B)-26.880)/128;
+            }
+        };
+
+        public static OdbPid Mode1_EngineReferenceTorque = new OdbPid()
+        {
+            Pid = "63",
+            ExpectedResponse = "",
+            Description = "Engine reference torque",
+            ByteCount = 2,
+            MinValue = 0,
+            MaxValue = 65535,
+            Units = "Nm",
+            Mode = OdbPids.ATSP1,
+            Priority = OdbPriority.High,
+            Compute = (A, B, C, D) =>
+            {
+                return A * 256 + B;
+            }
+        };
 
         #endregion
     }

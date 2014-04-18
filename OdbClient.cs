@@ -18,7 +18,7 @@ namespace OdbCommunicator
 {
     public class OdbClient
     {
-        public static int OBD_REFRESH_RATE = 500;
+        public static int OBD_REFRESH_RATE = 5;
         public static bool OBD_REPORTER_ENABLED = true;
 
         #region EVENTS
@@ -39,6 +39,16 @@ namespace OdbCommunicator
 
         private DispatcherTimer poller;
         private Dictionary<OdbPid, OdbQuery> queryResponses = new Dictionary<OdbPid, OdbQuery>();
+
+        /// <summary>
+        /// Priorities array
+        /// </summary>
+        private OdbPriority[] Priorities = new OdbPriority[] { 
+            OdbPriority.VeryHigh, OdbPriority.High, OdbPriority.VeryHigh, OdbPriority.High, OdbPriority.VeryHigh, OdbPriority.Medium,
+            OdbPriority.VeryHigh, OdbPriority.High, OdbPriority.VeryHigh, OdbPriority.High, OdbPriority.VeryHigh, OdbPriority.Medium,
+            OdbPriority.VeryHigh, OdbPriority.Small 
+        };
+        private System.Collections.IEnumerator PriorityEnumerator;
 
         #endregion
 
@@ -62,6 +72,8 @@ namespace OdbCommunicator
         /// </summary>
         public OdbClient()
         {
+
+            this.PriorityEnumerator = Priorities.GetEnumerator();
             this.socket = new OdbSocket(new StreamSocket());
 
             this.status = new OdbStatus(this.socket);
@@ -102,6 +114,21 @@ namespace OdbCommunicator
                 return response;
             }
             return null;
+        }
+
+        /// <summary>
+        /// Get data for pid
+        /// </summary>
+        /// <param name="pid"></param>
+        /// <returns></returns>
+        public void UnregisterQuery(OdbPid pid)
+        {
+            //remove query from databaze
+            if (queryResponses.ContainsKey(pid))
+            {
+                queryResponses.Remove(pid);
+                reporter.ReportDeleteQuery(pid);
+            }
         }
 
         #endregion
@@ -219,15 +246,28 @@ namespace OdbCommunicator
                 return;
             }
 
+            //pooler stop
             poller.Stop();
 
+            //get priority
+            var currentPriority = getCurrentPriority();
+
+            //iterate
             foreach (var q in queryResponses)
             {
                 OdbQuery query = q.Value;
-                if (query.Status != QueryStatus.NotSupported)
+                if (query.Status != QueryStatus.NotSupported && query.Pid.Priority == currentPriority)
                 {
-                    OdbResponse response = await this.socket.SendAndCheck(query.Pid);
-                    if (response.IsValid)
+                    OdbResponse response;
+                    try
+                    {
+                        response = await this.socket.SendAndCheck(query.Pid);
+                    }
+                    catch (OdbException)
+                    {
+                        response = null;
+                    }
+                    if (response != null && response.IsValid)
                     {
                         OdbData data = this.socket.ResolveData(response, query.Pid);
                         if (data != null)
@@ -237,20 +277,38 @@ namespace OdbCommunicator
                         }
                         else
                         {
-                            query.Status = QueryStatus.Error;
+                            query.Status = QueryStatus.NotSupported;
                         }
                     }
                     else
                     {
-                        query.Status = QueryStatus.Error;
+                        query.Status = QueryStatus.NotSupported;
                     }
                 }
+
+
+                //trigger data receive
+                triggerOnDataReceive();
             }
 
-            //trigger data receive
-            triggerOnDataReceive();
+            if (this.IsConnected)
+            {
+                poller.Start();
+            }
+        }
 
-            poller.Start();
+        /// <summary>
+        /// Get current priority
+        /// </summary>
+        /// <returns></returns>
+        private OdbPriority getCurrentPriority()
+        {
+            if (!PriorityEnumerator.MoveNext())
+            {
+                PriorityEnumerator.Reset();
+                PriorityEnumerator.MoveNext();
+            }
+            return (OdbPriority)PriorityEnumerator.Current;
         }
 
         /// <summary>

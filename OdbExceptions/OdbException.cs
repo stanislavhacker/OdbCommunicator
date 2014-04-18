@@ -15,6 +15,17 @@ namespace OdbCommunicator.OdbExceptions
         private DateTime time;
         private Int32 code;
 
+        /// <summary>
+        /// Type
+        /// </summary>
+        public OdbError Type 
+        {
+            get 
+            {
+                return type;
+            }
+        }
+
         private OdbReporter reporter = new OdbReporter();
 
         /// <summary>
