@@ -66,6 +66,8 @@ namespace OdbCommunicator.OdbExceptions
                     return 0x006;
                 case OdbError.IncorrectDataLength:
                     return 0x007;
+                case OdbError.DataParseError:
+                    return 0x008;
                 default:
                     return 0x000;
             }
@@ -94,6 +96,8 @@ namespace OdbCommunicator.OdbExceptions
                     return "Another response than expected from device.";
                 case OdbError.IncorrectDataLength:
                     return "Data provided has wrong length.";
+                case OdbError.DataParseError:
+                    return "Cannot read data for query, there is error in data response.";
                 default:
                     return "Unexpected error occured.";
             }

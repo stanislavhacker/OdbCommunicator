@@ -11,6 +11,7 @@ using OdbCommunicator.OdbCommon;
 using System.IO;
 using System.Diagnostics;
 using OdbCommunicator.OdbExceptions;
+using System.Text.RegularExpressions;
 
 namespace OdbCommunicator.OdbSockets
 {
@@ -127,9 +128,16 @@ namespace OdbCommunicator.OdbSockets
             DateTime start = DateTime.Now;
 
             //send
-            writer.WriteString(what.Pid + "\r\r");
-            await writer.StoreAsync();
-            await writer.FlushAsync();
+            try
+            {
+                writer.WriteString(what.Pid + "\r\r");
+                await writer.StoreAsync();
+                await writer.FlushAsync();
+            }
+            catch
+            {
+                throw new OdbException(OdbError.DeviceIsNotConnected);
+            }
 
             //receive data from device
             OdbResponse odbResponse = await receiveDataFromDevice(what, start);
@@ -191,7 +199,7 @@ namespace OdbCommunicator.OdbSockets
                     response += reader.ReadString(reader.UnconsumedBufferLength);
                 }
                 odbResponse.Response = this.clearResponse(response, what);
-                odbResponse.IsValid = this.isValidResponse(response);
+                odbResponse.IsValid = this.isValidResponse(response, what);
             }
             catch
             {
@@ -209,13 +217,39 @@ namespace OdbCommunicator.OdbSockets
         /// </summary>
         /// <param name="response"></param>
         /// <returns></returns>
-        private bool isValidResponse(String response)
+        private bool isValidResponse(String response, OdbPid what)
         {
-            var rightLength = response.Trim().Length > 0;
-            var containsError = response.ToLowerInvariant().Contains("error");
-            var containsUnknownChars = response.ToLowerInvariant().Trim() == ">";
+            var lowerResponse = response.ToLowerInvariant();
+            var rightLength = lowerResponse.Trim().Length > 0;
+            var containsError = lowerResponse.Contains("error");
+            var containsUnknownChars = lowerResponse.Trim() == ">";
+            var containsNoData = lowerResponse.Contains("no data") || lowerResponse.Contains("?");
 
+            //no data is valid response
+            if (containsNoData)
+            {
+                return true;
+            }
+
+            //if is data command then validate data length
+            if (what.IsDataCommand && this.ResolveData(response, what) == null)
+            {
+                return false;
+            }
+
+            //for normal command
             return rightLength && !containsError && !containsUnknownChars;
+        }
+
+        /// <summary>
+        /// resolve data
+        /// </summary>
+        /// <param name="response"></param>
+        /// <param name="what"></param>
+        /// <returns></returns>
+        public OdbData ResolveData(OdbResponse response, OdbPid what)
+        {
+            return this.ResolveData(response.Response, what);
         }
 
         /// <summary>
@@ -224,13 +258,15 @@ namespace OdbCommunicator.OdbSockets
         /// <param name="response"></param>
         /// <param name="what"></param>
         /// <returns></returns>
-        public OdbData ResolveData(OdbResponse response, OdbPid what)
+        public OdbData ResolveData(String response, OdbPid what)
         {
             int counter = 0;
-            String[] bytes = response.Response.Split(' ');
+
+            String[] bytes = response.Split(' ');
+            bytes = this.validateReponseBytes(bytes);
             OdbData data = OdbPids.GetResponseFormatForProtocolNumber(bytes.Length, what.ByteCount);
 
-            if (bytes.Length < what.ByteCount || response.Response == "?")
+            if (bytes.Length < what.ByteCount)
             {
                 return null;
             }
@@ -266,7 +302,38 @@ namespace OdbCommunicator.OdbSockets
             return data;
         }
 
+        /// <summary>
+        /// Validate response from device
+        /// </summary>
+        /// <param name="bytes"></param>
+        private string[] validateReponseBytes(string[] bytes)
+        {
+            List<string> data = new List<string>();
+            Regex regex = new Regex("^[A-Fa-f0-9]{2,4}$");
 
+            for (var i = 0; i < bytes.Length; i++)
+            {
+                var chunk = bytes[i];
+                if (regex.Match(chunk).Length > 0)
+                {
+                    if (chunk.Length == 2)
+                    {
+                        data.Add(chunk);
+                    }
+                    if (chunk.Length == 3)
+                    {
+                        chunk = "0" + chunk;
+                    }
+                    if (chunk.Length == 4)
+                    {
+                        data.Add(chunk.Substring(0, 2));
+                        data.Add(chunk.Substring(2, 2));
+                    }
+                }
+            }
+
+            return data.ToArray();
+        }
 
         /// <summary>
         /// Clear response message
@@ -281,17 +348,29 @@ namespace OdbCommunicator.OdbSockets
             for (int i = lines.Length - 1; i >= 0; i--)
             {
                 String line = lines[i];
-                line = line.Replace("\n", " ");
-                line = line.Replace(">", "");
-                line = line.Replace(what.Pid, "");
-                line = line.Trim();
+                line = this.clearLine(what, line);
 
                 if (line.Length > 0)
                 {
                     return line;
                 }
             }
-            return lines.Last().Trim();
+            return this.clearLine(what, lines.Last());
+        }
+
+        /// <summary>
+        /// Clear line
+        /// </summary>
+        /// <param name="what"></param>
+        /// <param name="line"></param>
+        /// <returns></returns>
+        private string clearLine(OdbPid what, String line)
+        {
+            line = line.Replace("\n", " ");
+            line = line.Replace(">", "");
+            line = line.Replace(what.Pid, "");
+            line = line.Trim();
+            return line;
         }
 
 
@@ -306,8 +385,7 @@ namespace OdbCommunicator.OdbSockets
             {
                 return 500;
             }
-            return 200;
+            return 250;
         }
-
     }
 }

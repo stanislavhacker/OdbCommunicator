@@ -19,6 +19,10 @@ namespace OdbCommunicator.OdbCommon
                 {
                     return pid;
                 }
+                if (IsFastReading == false)
+                {
+                    return Mode.PidPrefix + " " + pid;
+                }
                 return Mode.PidPrefix + " " + pid + " 1";
             }
             set
@@ -52,6 +56,17 @@ namespace OdbCommunicator.OdbCommon
         /// Is not obd but ELM327 command type
         /// </summary>
         public Boolean IsElmCommand { get; set; }
+
+        /// <summary>
+        /// Is fast reading
+        /// </summary>
+        public Boolean IsFastReading { get; set; }
+
+        
+        /// <summary>
+        /// Is data command
+        /// </summary>
+        public Boolean IsDataCommand { get; set; }
 
         /// <summary>
         /// Bytes count that must be in response

@@ -14,6 +14,7 @@ namespace OdbCommunicator.OdbExceptions
         WrongResponseFromDevice,
         AlreadyConnectedToDevice,
         DeviceIsNotConnected,
-        IncorrectDataLength
+        IncorrectDataLength,
+        DataParseError
     }
 }

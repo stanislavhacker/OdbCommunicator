@@ -276,7 +276,14 @@ namespace OdbCommunicator
                         if (data != null)
                         {
                             query.Status = QueryStatus.Complete;
-                            query.Data = this.parseDataForSpecifiedPid(query.Pid, data);
+                            try
+                            {
+                                query.Data = this.parseDataForSpecifiedPid(query.Pid, data);
+                            }
+                            catch
+                            {
+                                new OdbException(OdbError.DataParseError);
+                            }
                         }
                         else
                         {

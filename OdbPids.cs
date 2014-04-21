@@ -60,6 +60,12 @@ namespace OdbCommunicator
                     data.Data = new string[dataLength];
                     data.Ender = new string[1];
                     break;
+                case 5:
+                    data.Header = new string[3];
+                    data.Info = new string[2];
+                    data.Data = new string[dataLength];
+                    data.Ender = new string[0];
+                    break;
                 case 3:
                     data.Header = new string[0];
                     data.Info = new string[2];
@@ -109,63 +115,72 @@ namespace OdbCommunicator
             Pid = "ATZ",
             ExpectedResponse = "ELM327",
             Description = "Reset ELM327 device",
-            IsElmCommand = true
+            IsElmCommand = true,
+            IsFastReading = false
         };
         public static readonly OdbPid ATWS = new OdbPid()
         {
             Pid = "ATWS",
             ExpectedResponse = "ELM327",
             Description = "Soft reset ELM327 device",
-            IsElmCommand = true
+            IsElmCommand = true,
+            IsFastReading = false
         };
         public static readonly OdbPid ATDP = new OdbPid()
         {
             Pid = "ATDP",
             ExpectedResponse = "",
             Description = "Show selected protocol",
-            IsElmCommand = true
+            IsElmCommand = true,
+            IsFastReading = false
         };
         public static readonly OdbPid ATE0 = new OdbPid()
         {
             Pid = "ATE0",
             ExpectedResponse = "OK",
             Description = "Disable echo on device",
-            IsElmCommand = true
+            IsElmCommand = true,
+            IsFastReading = false
         };
         public static readonly OdbPid ATE1 = new OdbPid()
         {
             Pid = "ATE1",
             ExpectedResponse = "OK",
             Description = "Enable echo on device",
-            IsElmCommand = true
+            IsElmCommand = true,
+            IsFastReading = false
         };
         public static readonly OdbPid ATL0 = new OdbPid()
         {
             Pid = "ATL0",
             ExpectedResponse = "OK",
             Description = "Disable lines feed",
-            IsElmCommand = true
+            IsElmCommand = true,
+            IsFastReading = false
         };
         public static readonly OdbPid ATL1 = new OdbPid()
         {
             Pid = "ATL1",
             ExpectedResponse = "OK",
             Description = "Enable lines feed",
-            IsElmCommand = true
+            IsElmCommand = true,
+            IsFastReading = false
         };
         public static readonly OdbPid ATH0 = new OdbPid()
         {
             Pid = "ATH0",
             ExpectedResponse = "OK",
             Description = "Headers disable",
-            IsElmCommand = true
+            IsElmCommand = true,
+            IsFastReading = false
         };
         public static readonly OdbPid ATH1 = new OdbPid()
         {
             Pid = "ATH1",
             ExpectedResponse = "OK",
             Description = "Headers enable",
-            IsElmCommand = true
+            IsElmCommand = true,
+            IsFastReading = false
         };
 
         #endregion
@@ -178,7 +193,8 @@ namespace OdbCommunicator
             Pid = "ATSP0",
             ExpectedResponse = "OK",
             Description = "Protocol ATSP0 (AUTO)",
-            IsElmCommand = true
+            IsElmCommand = true,
+            IsFastReading = false
         };
         public static readonly OdbPid ATSP1 = new OdbPid()
         {
@@ -186,7 +202,8 @@ namespace OdbCommunicator
             ExpectedResponse = "OK",
             Description = "Protocol ATSP1",
             IsElmCommand = true,
-            PidPrefix = "01"
+            PidPrefix = "01",
+            IsFastReading = false
         };
         public static readonly OdbPid ATSP2 = new OdbPid()
         {
@@ -194,7 +211,8 @@ namespace OdbCommunicator
             ExpectedResponse = "OK",
             Description = "Protocol ATSP2",
             IsElmCommand = true,
-            PidPrefix = "02"
+            PidPrefix = "02",
+            IsFastReading = false
         };
         public static readonly OdbPid ATSP3 = new OdbPid()
         {
@@ -202,7 +220,8 @@ namespace OdbCommunicator
             ExpectedResponse = "OK",
             Description = "Protocol ATSP3",
             IsElmCommand = true,
-            PidPrefix = "03"
+            PidPrefix = "03",
+            IsFastReading = false
         };
         public static readonly OdbPid ATSP4 = new OdbPid()
         {
@@ -210,7 +229,8 @@ namespace OdbCommunicator
             ExpectedResponse = "OK",
             Description = "Protocol ATSP4",
             IsElmCommand = true,
-            PidPrefix = "04"
+            PidPrefix = "04",
+            IsFastReading = false
         };
         public static readonly OdbPid ATSP5 = new OdbPid()
         {
@@ -218,7 +238,8 @@ namespace OdbCommunicator
             ExpectedResponse = "OK",
             Description = "Protocol ATSP5",
             IsElmCommand = true,
-            PidPrefix = "05"
+            PidPrefix = "05",
+            IsFastReading = false
         };
         public static readonly OdbPid ATSP6 = new OdbPid()
         {
@@ -226,7 +247,8 @@ namespace OdbCommunicator
             ExpectedResponse = "OK",
             Description = "Protocol ATSP6",
             IsElmCommand = true,
-            PidPrefix = "06"
+            PidPrefix = "06",
+            IsFastReading = false
         };
         public static readonly OdbPid ATSP7 = new OdbPid()
         {
@@ -234,7 +256,8 @@ namespace OdbCommunicator
             ExpectedResponse = "OK",
             Description = "Protocol ATSP7",
             IsElmCommand = true,
-            PidPrefix = "07"
+            PidPrefix = "07",
+            IsFastReading = false
         };
         public static readonly OdbPid ATSP8 = new OdbPid()
         {
@@ -242,7 +265,8 @@ namespace OdbCommunicator
             ExpectedResponse = "OK",
             Description = "Protocol ATSP8",
             IsElmCommand = true,
-            PidPrefix = "08"
+            PidPrefix = "08",
+            IsFastReading = false
         };
         public static readonly OdbPid ATSP9 = new OdbPid()
         {
@@ -250,7 +274,8 @@ namespace OdbCommunicator
             ExpectedResponse = "OK",
             Description = "Protocol ATSP9",
             IsElmCommand = true,
-            PidPrefix = "09"
+            PidPrefix = "09",
+            IsFastReading = false
         };
 
         #endregion
@@ -264,7 +289,9 @@ namespace OdbCommunicator
             ExpectedResponse = "",
             Description = "PIDs supported [01 - 20]",
             ByteCount = 4,
-            Mode = OdbPids.ATSP1
+            Mode = OdbPids.ATSP1,
+            IsFastReading = false,
+            IsDataCommand = true
         };
         public static readonly OdbPid Mode1_PidsSupported40 = new OdbPid()
         {
@@ -272,7 +299,9 @@ namespace OdbCommunicator
             ExpectedResponse = "",
             Description = "PIDs supported [21 - 40]",
             ByteCount = 4,
-            Mode = OdbPids.ATSP1
+            Mode = OdbPids.ATSP1,
+            IsFastReading = false,
+            IsDataCommand = true
         };
         public static readonly OdbPid Mode1_PidsSupported60 = new OdbPid()
         {
@@ -280,7 +309,9 @@ namespace OdbCommunicator
             ExpectedResponse = "",
             Description = "PIDs supported [41 - 60]",
             ByteCount = 4,
-            Mode = OdbPids.ATSP1
+            Mode = OdbPids.ATSP1,
+            IsFastReading = false,
+            IsDataCommand = true
         };
         public static readonly OdbPid Mode1_PidsSupported80 = new OdbPid()
         {
@@ -288,7 +319,9 @@ namespace OdbCommunicator
             ExpectedResponse = "",
             Description = "PIDs supported [61 - 80]",
             ByteCount = 4,
-            Mode = OdbPids.ATSP1
+            Mode = OdbPids.ATSP1,
+            IsFastReading = false,
+            IsDataCommand = true
         };
 
         #endregion
@@ -306,6 +339,8 @@ namespace OdbCommunicator
             Units = "°C",
             Mode = OdbPids.ATSP1,
             Priority = OdbPriority.Small,
+            IsFastReading = true,
+            IsDataCommand = true,
             Compute = (A, B, C, D) =>
             {
                 return A - 40;
@@ -323,6 +358,8 @@ namespace OdbCommunicator
             Units = "RPM",
             Mode = OdbPids.ATSP1,
             Priority = OdbPriority.VeryHigh,
+            IsFastReading = true,
+            IsDataCommand = true,
             Compute = (A, B, C, D) => {
                 return ((A * 256) + B) / 4;
             }
@@ -339,6 +376,8 @@ namespace OdbCommunicator
             Units = "km/h",
             Mode = OdbPids.ATSP1,
             Priority = OdbPriority.VeryHigh,
+            IsFastReading = true,
+            IsDataCommand = true,
             Compute = (A, B, C, D) =>
             {
                 return A;
@@ -356,6 +395,8 @@ namespace OdbCommunicator
             Units = "%",
             Mode = OdbPids.ATSP1,
             Priority = OdbPriority.High,
+            IsFastReading = true,
+            IsDataCommand = true,
             Compute = (A, B, C, D) =>
             {
                 return (A * 100) / 255;
@@ -373,6 +414,8 @@ namespace OdbCommunicator
             Units = "grams/sec",
             Mode = OdbPids.ATSP1,
             Priority = OdbPriority.Medium,
+            IsFastReading = true,
+            IsDataCommand = true,
             Compute = (A, B, C, D) =>
             {
                 return ((A * 256) + B) / 100;
@@ -390,6 +433,8 @@ namespace OdbCommunicator
             Units = "%",
             Mode = OdbPids.ATSP1,
             Priority = OdbPriority.High,
+            IsFastReading = true,
+            IsDataCommand = true,
             Compute = (A, B, C, D) =>
             {
                 return (A * 100) / 255;
@@ -407,6 +452,8 @@ namespace OdbCommunicator
             Units = "seconds",
             Mode = OdbPids.ATSP1,
             Priority = OdbPriority.Small,
+            IsFastReading = true,
+            IsDataCommand = true,
             Compute = (A, B, C, D) =>
             {
                 return (A * 256) + B;
@@ -424,6 +471,8 @@ namespace OdbCommunicator
             Units = "%",
             Mode = OdbPids.ATSP1,
             Priority = OdbPriority.High,
+            IsFastReading = true,
+            IsDataCommand = true,
             Compute = (A, B, C, D) =>
             {
                 return (A * 100) / 255;
@@ -441,6 +490,8 @@ namespace OdbCommunicator
             Units = "°C",
             Mode = OdbPids.ATSP1,
             Priority = OdbPriority.Small,
+            IsFastReading = true,
+            IsDataCommand = true,
             Compute = (A, B, C, D) =>
             {
                 return A - 40;
@@ -458,6 +509,8 @@ namespace OdbCommunicator
             Units = "°",
             Mode = OdbPids.ATSP1,
             Priority = OdbPriority.Medium,
+            IsFastReading = true,
+            IsDataCommand = true,
             Compute = (A, B, C, D) =>
             {
                 return (((A*256)+B)-26.880)/128;
@@ -475,6 +528,8 @@ namespace OdbCommunicator
             Units = "Nm",
             Mode = OdbPids.ATSP1,
             Priority = OdbPriority.High,
+            IsFastReading = true,
+            IsDataCommand = true,
             Compute = (A, B, C, D) =>
             {
                 return A * 256 + B;
