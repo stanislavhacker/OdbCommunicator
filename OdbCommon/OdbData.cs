@@ -29,7 +29,12 @@ namespace OdbCommunicator.OdbCommon
         /// <returns></returns>
         public int EcuIdentifier()
         {
-            return Convert.ToInt32(String.Join("", this.Header), 16);
+            var header = String.Join("", this.Header);
+            if (String.IsNullOrWhiteSpace(header)) 
+            {
+                return 0;
+            }
+            return Convert.ToInt32(header, 16);
         }
     }
 }

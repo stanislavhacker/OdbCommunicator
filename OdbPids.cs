@@ -44,29 +44,57 @@ namespace OdbCommunicator
         /// <summary>
         /// get response formater
         /// </summary>
-        /// <param name="protocolNumber"></param>
+        /// <param name="responseLength"></param>
         /// <param name="dataLength"></param>
         /// <returns></returns>
-        public static OdbData GetResponseFormatForProtocolNumber(int protocolNumber, int dataLength)
+        public static OdbData GetResponseFormatForProtocolNumber(int responseLength, int dataLength)
         {
             OdbData data = new OdbData();
-            switch (protocolNumber)
+            var added = responseLength - dataLength;
+
+            switch (added)
             {
-                case 1:
+                case 6:
                     data.Header = new string[3];
                     data.Info = new string[2];
                     data.Data = new string[dataLength];
                     data.Ender = new string[1];
-                    data.DataLength = dataLength + 6;
+                    break;
+                case 3:
+                    data.Header = new string[0];
+                    data.Info = new string[2];
+                    data.Data = new string[dataLength];
+                    data.Ender = new string[1];
+                    break;
+                case 2:
+                    data.Header = new string[0];
+                    data.Info = new string[2];
+                    data.Data = new string[dataLength];
+                    data.Ender = new string[0];
+                    break;
+                case 1:
+                    data.Header = new string[0];
+                    data.Info = new string[0];
+                    data.Data = new string[dataLength];
+                    data.Ender = new string[1];
+                    break;
+                case 0:
+                    data.Header = new string[0];
+                    data.Info = new string[0];
+                    data.Data = new string[dataLength];
+                    data.Ender = new string[0];
                     break;
                 default:
                     data.Header = new string[0];
                     data.Info = new string[0];
                     data.Data = new string[0];
                     data.Ender = new string[0];
-                    data.DataLength = 0;
                     break;
             }
+
+            //calculate full length
+            data.DataLength = data.Data.Length + data.Header.Length + data.Info.Length + data.Ender.Length;
+
             return data;
         }
 
@@ -83,6 +111,20 @@ namespace OdbCommunicator
             Description = "Reset ELM327 device",
             IsElmCommand = true
         };
+        public static readonly OdbPid ATWS = new OdbPid()
+        {
+            Pid = "ATWS",
+            ExpectedResponse = "ELM327",
+            Description = "Soft reset ELM327 device",
+            IsElmCommand = true
+        };
+        public static readonly OdbPid ATDP = new OdbPid()
+        {
+            Pid = "ATDP",
+            ExpectedResponse = "",
+            Description = "Show selected protocol",
+            IsElmCommand = true
+        };
         public static readonly OdbPid ATE0 = new OdbPid()
         {
             Pid = "ATE0",
@@ -90,11 +132,32 @@ namespace OdbCommunicator
             Description = "Disable echo on device",
             IsElmCommand = true
         };
+        public static readonly OdbPid ATE1 = new OdbPid()
+        {
+            Pid = "ATE1",
+            ExpectedResponse = "OK",
+            Description = "Enable echo on device",
+            IsElmCommand = true
+        };
         public static readonly OdbPid ATL0 = new OdbPid()
         {
             Pid = "ATL0",
             ExpectedResponse = "OK",
             Description = "Disable lines feed",
+            IsElmCommand = true
+        };
+        public static readonly OdbPid ATL1 = new OdbPid()
+        {
+            Pid = "ATL1",
+            ExpectedResponse = "OK",
+            Description = "Enable lines feed",
+            IsElmCommand = true
+        };
+        public static readonly OdbPid ATH0 = new OdbPid()
+        {
+            Pid = "ATH0",
+            ExpectedResponse = "OK",
+            Description = "Headers disable",
             IsElmCommand = true
         };
         public static readonly OdbPid ATH1 = new OdbPid()
@@ -114,7 +177,7 @@ namespace OdbCommunicator
         {
             Pid = "ATSP0",
             ExpectedResponse = "OK",
-            Description = "Protocol ATSP0",
+            Description = "Protocol ATSP0 (AUTO)",
             IsElmCommand = true
         };
         public static readonly OdbPid ATSP1 = new OdbPid()

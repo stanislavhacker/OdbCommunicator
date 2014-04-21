@@ -121,6 +121,11 @@ namespace OdbCommunicator.OdbCheck
             if (supportedPids.ContainsKey(ecu.EcuId))
             {
                 var modes = supportedPids[ecu.EcuId];
+                if (modes.ContainsKey(OdbPids.ATSP0))
+                {
+                    var pids = modes[OdbPids.ATSP0];
+                    return pids.Contains(pid.GetPidIdInDecimal());
+                }
                 if (modes.ContainsKey(pid.Mode))
                 {
                     var pids = modes[pid.Mode];

@@ -178,9 +178,12 @@ namespace OdbCommunicator
         {
             if (this.IsConnected)
             {
-                this.poller.Stop();
-                this.poller = null;
-
+                if (this.poller != null)
+                {
+                    this.poller.Stop();
+                    this.poller = null;
+                }
+                //disconnect socket
                 this.socket.Disconnect();
             }
         }

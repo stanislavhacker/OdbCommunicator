@@ -39,8 +39,8 @@ namespace OdbCommunicator.OdbSockets
         /// <summary>
         /// Selected protocol
         /// </summary>
-        private int selectedProtocol = -1;
-        public int SelectedProtocol
+        private OdbPid selectedProtocol = OdbPids.ATSP0;
+        public OdbPid SelectedProtocol
         {
             get
             {
@@ -127,7 +127,7 @@ namespace OdbCommunicator.OdbSockets
             DateTime start = DateTime.Now;
 
             //send
-            writer.WriteString(what.Pid + "\r");
+            writer.WriteString(what.Pid + "\r\r");
             await writer.StoreAsync();
             await writer.FlushAsync();
 
@@ -137,7 +137,7 @@ namespace OdbCommunicator.OdbSockets
             //try again on error reponse
             while (!odbResponse.IsValid && this.tryCount > 0)
             {
-                reporter.ReportInfo("Incorrect response from device. Try another request. Current try step is " + this.tryCount + ".");
+                reporter.ReportInfo("Incorrect response '" + odbResponse.Response + "' from device. Try another request. Current try step is " + this.tryCount + ".");
                 odbResponse = await receiveDataFromDevice(what, start);
                 this.tryCount--;
             }
@@ -191,7 +191,7 @@ namespace OdbCommunicator.OdbSockets
                     response += reader.ReadString(reader.UnconsumedBufferLength);
                 }
                 odbResponse.Response = this.clearResponse(response, what);
-                odbResponse.IsValid = response.Trim().Length > 0;
+                odbResponse.IsValid = this.isValidResponse(response);
             }
             catch
             {
@@ -205,6 +205,20 @@ namespace OdbCommunicator.OdbSockets
         }
 
         /// <summary>
+        /// Is valid response from device
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        private bool isValidResponse(String response)
+        {
+            var rightLength = response.Trim().Length > 0;
+            var containsError = response.ToLowerInvariant().Contains("error");
+            var containsUnknownChars = response.ToLowerInvariant().Trim() == ">";
+
+            return rightLength && !containsError && !containsUnknownChars;
+        }
+
+        /// <summary>
         /// Resolve incoming data and setup odb data
         /// </summary>
         /// <param name="response"></param>
@@ -214,16 +228,16 @@ namespace OdbCommunicator.OdbSockets
         {
             int counter = 0;
             String[] bytes = response.Response.Split(' ');
-            OdbData data = OdbPids.GetResponseFormatForProtocolNumber(this.SelectedProtocol, what.ByteCount);
+            OdbData data = OdbPids.GetResponseFormatForProtocolNumber(bytes.Length, what.ByteCount);
 
-            if (bytes.Length < what.ByteCount)
+            if (bytes.Length < what.ByteCount || response.Response == "?")
             {
                 return null;
             }
 
             try
             {
-                data.Protocol = OdbPids.GetPidForProtocolNumber(this.SelectedProtocol);
+                data.Protocol = this.SelectedProtocol;
                 for (int i = 0; i < data.Header.Length; i++)
                 {
                     data.Header[i] = bytes[counter];
@@ -290,9 +304,9 @@ namespace OdbCommunicator.OdbSockets
         {
             if (what.IsElmCommand)
             {
-                return 250;
+                return 500;
             }
-            return 150;
+            return 200;
         }
 
     }

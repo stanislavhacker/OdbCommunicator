@@ -19,7 +19,7 @@ namespace OdbCommunicator.OdbCommon
                 {
                     return pid;
                 }
-                return Mode.PidPrefix + " " + pid;
+                return Mode.PidPrefix + " " + pid + " 1";
             }
             set
             {

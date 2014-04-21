@@ -34,7 +34,7 @@ namespace OdbCommunicator.OdbCheck
             {
                 try
                 {
-                    await this.resetAndMakeInitialization();
+                    await this.Initialize();
                     return true;
                 }
                 catch
@@ -45,25 +45,20 @@ namespace OdbCommunicator.OdbCheck
             return false;
         }
 
-
-
-
-
-
         /// <summary>
-        /// Reset and make initialization
+        /// Initialize
         /// </summary>
         /// <returns></returns>
-        private async Task resetAndMakeInitialization()
+        public async Task Initialize()
         {
             try
             {
-                await this.socket.SendAndCheck(OdbPids.ATZ);
-                await this.socket.SendAndCheck(OdbPids.ATE0);
-                await this.socket.SendAndCheck(OdbPids.ATL0);
-
-                await this.checkSupportedProtocols();
-                await this.socket.Send(OdbPids.ATH1);
+                await this.SoftReset();
+                await this.Echo(false);
+                await this.LineFeed(false);
+                await this.Headers(true);
+                await this.LoadSupportedProtocols();
+                await this.ShowProcotolName();
             }
             catch
             {
@@ -72,23 +67,85 @@ namespace OdbCommunicator.OdbCheck
         }
 
         /// <summary>
-        /// Check supported PIds
+        /// Show protocol name
         /// </summary>
         /// <returns></returns>
-        private async Task checkSupportedProtocols(OdbProtocol protocolType = OdbProtocol.Unknown, int protocolNumber = 0)
+        public async Task ShowProcotolName()
+        {
+            await this.socket.SendAndCheck(OdbPids.ATDP);
+        }
+
+        /// <summary>
+        /// Reset
+        /// </summary>
+        /// <returns></returns>
+        public async Task Reset()
+        {
+            await this.socket.SendAndCheck(OdbPids.ATZ);
+        }
+
+        /// <summary>
+        /// Soft reset
+        /// </summary>
+        /// <returns></returns>
+        public async Task SoftReset()
+        {
+            await this.socket.SendAndCheck(OdbPids.ATWS);
+        }
+
+        /// <summary>
+        /// Echo
+        /// </summary>
+        /// <param name="enable"></param>
+        /// <returns></returns>
+        public async Task Echo(Boolean enable)
+        {
+            var pid = enable ? OdbPids.ATE1 : OdbPids.ATE0;
+            await this.socket.SendAndCheck(pid);
+        }
+
+        /// <summary>
+        /// Line feed
+        /// </summary>
+        /// <param name="enable"></param>
+        /// <returns></returns>
+        public async Task LineFeed(Boolean enable)
+        {
+            var pid = enable ? OdbPids.ATL1 : OdbPids.ATL0;
+            await this.socket.SendAndCheck(pid);
+        }
+
+        /// <summary>
+        /// Header
+        /// </summary>
+        /// <param name="enable"></param>
+        /// <returns></returns>
+        public async Task Headers(Boolean enable)
+        {
+            var pid = enable ? OdbPids.ATH1 : OdbPids.ATH0;
+            await this.socket.SendAndCheck(pid);
+        }
+
+
+
+        /// <summary>
+        /// Load supported PIds
+        /// </summary>
+        /// <returns></returns>
+        private async Task LoadSupportedProtocols(OdbProtocol protocolType = OdbProtocol.Unknown, int protocolNumber = 0)
         {
             var selectedProtocol = -1;
 
             if (protocolType == OdbProtocol.Unknown)
             {
-                for (selectedProtocol = 1; selectedProtocol <= 9; selectedProtocol++)
+                OdbPid protocol = null;
+                for (selectedProtocol = 0; selectedProtocol <= 9; selectedProtocol++)
                 {
-                    OdbPid protocol = OdbPids.GetPidForProtocolNumber(selectedProtocol);
+                    protocol = OdbPids.GetPidForProtocolNumber(selectedProtocol);
                     try
                     {
-                        await this.socket.SendAndCheck(protocol);
-                        await this.socket.SendAndCheck(OdbPids.Mode1_PidsSupported20);
-                        break;
+                        OdbResponse response = await this.socket.SendAndCheck(protocol);
+                        if (response.IsValid) break;
                     }
                     catch
                     {
@@ -101,14 +158,13 @@ namespace OdbCommunicator.OdbCheck
                     throw new OdbException(OdbError.CouldNotFindCompatibleProtocol);
                 }
 
-                this.socket.SelectedProtocol = selectedProtocol;
+                this.socket.SelectedProtocol = protocol;
             }
             else if (protocolType == OdbProtocol.Specified && protocolNumber > 0 && protocolNumber < 10)
             {
-                await this.socket.SendAndCheck(OdbPids.GetPidForProtocolNumber(protocolNumber));
-                await this.socket.SendAndCheck(OdbPids.Mode1_PidsSupported20);
-
-                this.socket.SelectedProtocol = protocolNumber;
+                OdbPid protocol = OdbPids.GetPidForProtocolNumber(selectedProtocol);
+                await this.socket.SendAndCheck(protocol);
+                this.socket.SelectedProtocol = protocol;
             }
             else
             {
