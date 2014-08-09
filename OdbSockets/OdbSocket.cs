@@ -136,6 +136,7 @@ namespace OdbCommunicator.OdbSockets
             }
             catch
             {
+                this.IsConnected = false;
                 throw new OdbException(OdbError.DeviceIsNotConnected);
             }
 
